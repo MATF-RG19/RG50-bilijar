@@ -1,16 +1,19 @@
 CC=g++
-PROGRAM = pool
+PROGRAM = bilijar
 
-pool: main.o table.o draw_functions.o
-	$(CC) -o $(PROGRAM) main.o table.o draw_functions.o -lGL -lGLU -lglut -lm
+bilijar: main.o table.o draw_functions.o ball.o
+	$(CC) -o $(PROGRAM) main.o table.o draw_functions.o ball.o -lGL -lGLU -lglut -lm
 
 main.o: main.cpp
 	$(CC) -c main.cpp
 
 table.o: table.cpp table.h
-	$(CC) -c table.cpp 
+	$(CC) -c table.cpp
 
-ball.o: draw_functions.cpp draw_functions.h
+ball.o: ball.cpp ball.h
+	$(CC) -c ball.cpp 
+
+draw_functions.o: draw_functions.cpp draw_functions.h
 	$(CC) -c draw_functions.cpp
 
 run: $(PROGRAM)

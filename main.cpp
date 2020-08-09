@@ -54,6 +54,7 @@ void display(void)
 	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
+    table.start();
 	table.draw();
 
 	

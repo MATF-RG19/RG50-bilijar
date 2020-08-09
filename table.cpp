@@ -4,20 +4,63 @@
 #include "table.h"
 
 
+
 Table::Table()
 {
+    
+	//https://tug.org/pracjourn/2007-4/walden/color.pdf
 
-	//Neka struktura ili klasa koja ce da sadrzi lopte i stapove.
+    balls[0].setColor(0.9, 0.9, 0.9); // bela
+	balls[1].setColor(1.0, 0.9, 0.2); // zuta
+	balls[2].setColor(0.1, 0.2, 0.7); // tamno plava
+	balls[3].setColor(1.0, 0.0, 0.0); // crvena
+	balls[4].setColor(0.4, 0.0, 0.5); // tamno ljubicasta
+	balls[5].setColor(1.0, 0.5, 0.3); // svetlo narandzasta
+	balls[6].setColor(0.2, 0.8, 0.4); // zelena
+	balls[7].setColor(1.0, 0.5, 0.8); // svetlo ljubicasta
+	balls[8].setColor(0.0, 0.0, 0.0); // crna
+	balls[9].setColor(0.6, 0.5, 0.2); // tamno zuta
+	balls[10].setColor(0.2, 0.5, 1.0); // plava
+	balls[11].setColor(1.0, 0.2, 0.3); // svetlo crvena
+	balls[12].setColor(0.7, 0.0, 0.7); // ljubicasta
+	balls[13].setColor(0.8, 0.3, 0.0); // narandzasta
+	balls[14].setColor(0.0, 0.3, 0.2); // tamno zelena
+	balls[15].setColor(0.5, 0.0, 0.0); // tamno crvena
+	
 
-	//TO DO 
+	//TO DO
 
+}
+
+void Table::start(){
+	//Pocetna pozicija za belu loptu
+	balls[0].setPosition(2, 0);
+	balls[0].setV(0, 0);
+	balls[0].setVisible(true);
+
+	// Pocetna pozicija za ostale lopte, pravim trougao.
+	int k = 1;
+	for(int i = 1; i < 6; i++)
+	{
+		for(int j = 1; j < i + 1; j++)
+		{
+			
+			double r = balls[k].getRadius();
+			double x = (6 - i * 2) * r - 2;
+			double z = (j * 2 - i - 1) * r;
+			balls[k].setPosition(x, z);
+			balls[k].setV(0, 0);
+			balls[k].setVisible(true);
+			k++;
+		}
+	}
 }
 
 void Table::draw()
 {
 
 
-	//"https://tug.org/pracjourn/2007-4/walden/color.pdf"
+	
 
 
 	// Pod na kojem je sto
@@ -112,6 +155,9 @@ void Table::draw()
 	glTranslated(+0.0, +3.0, 0.0); drawCylinder(0.2, 0.2, 2);
 	glPopMatrix();
 
-
+	for(int i = 0; i < 16; i++)
+	{
+		balls[i].draw();
+	}
 
 }

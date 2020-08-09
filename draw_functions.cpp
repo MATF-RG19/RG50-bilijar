@@ -46,6 +46,20 @@ void drawCylinder(double baseRadius, double topRadius, double height)
 	glPopMatrix();
 }
 
+void setShininess(double s)
+{
+	// sjaj
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 128);
+
+	// boja
+	float colour[4];
+	colour[0] = (float)s;
+	colour[1] = (float)s;
+	colour[2] = (float)s;
+	colour[3] = 1;
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, colour);
+}
+
 
 
 
