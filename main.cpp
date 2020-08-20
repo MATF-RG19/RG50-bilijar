@@ -5,13 +5,85 @@
 #include "draw_functions.h"
 #include "table.h"
 
+//Pre pocetka rada sam pogledao neke prethodne projekte kao i projekat kolege koji je radio bilijar pre mene.
+// Takodje za dosta stvari sam koristio Khan akademiju, 
+//https://www.khanacademy.org/science/physics/two-dimensional-motion/two-dimensional-projectile-mot/a/what-are-velocity-components
+//Koristio sam red book 
+//http://www.glprogramming.com/red/
+// I generalno razgledao razne tutoriale po YT ali tada nisam kopirao linkove pa nmgu da ih okacim.
+// Dosta parametara sam birao nasumicno, pa prepravljao nakon pokretanja ukoliko su losi, pa usled nedostatka 
+//vremena dosta parametra je verovatno losije.
+
+
 Table table;
 double camAngle1 = -90;
 double camAngle2 = 20;
 
+void keyboard(unsigned char key, int x, int y)
+{
+	switch(key)
+	{
+	case ' ':
+		// Restart na space.
+		table.start();
+		break;
+	case 27:
+		// Quit na exc
+		exit(0);
+		break;
+	}
+	
+}
+
+
+void passive(int x, int y)
+{
+	// Podesavanje ugla stapa
+	int centre = glutGet(GLUT_WINDOW_WIDTH)/2;
+	table.setStickAngle((x - centre) * 0.2 - camAngle1);
+}
+
+// Funkcija za reagovanje na pritiskanje dugmica na tastaturi koji se ne mogu prestaviti ASCII-jem
+void special(int key, int x, int y)
+{
+	// Rotiranje kamere sa strelicama
+	switch(key)
+	{
+	case GLUT_KEY_LEFT:
+		camAngle1 -= 5;
+		break;
+	case GLUT_KEY_RIGHT:
+		camAngle1 += 5;
+		break;
+	case GLUT_KEY_UP:
+		camAngle2 -= 5;
+		break;
+	case GLUT_KEY_DOWN:
+		camAngle2 += 5;
+	}
+
+	// Ogranjicenje ugla
+	if(camAngle2 < 10) camAngle2 = 10;
+	if(camAngle2 > 80) camAngle2 = 80;
+}
+
+
+void mouse(int button, int state, int x, int y)
+{
+	// Za udarac
+	if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	{
+		if(!table.moving()) table.shoot();
+	}
+}
+
+
 void display(void)
 {
 	
+	int currentTime = glutGet(GLUT_ELAPSED_TIME); //Za dobijanje Delta t, ondnosno vremena izmedju frejmova.
+	table.update(currentTime);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 
@@ -54,7 +126,7 @@ void display(void)
 	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
-    table.start();
+    
 	table.draw();
 
 	
@@ -70,10 +142,11 @@ int main(int argc, char* argv[])
 	glutInitWindowSize(1280, 720);
 	glutCreateWindow("Bilijar");
 
-	
-
+	glutKeyboardFunc(keyboard);
+	glutSpecialFunc(special);
+	glutMouseFunc(mouse);
+	glutPassiveMotionFunc(passive);
 	glutDisplayFunc(display);
-
 
 	glutMainLoop();
 	return 0;

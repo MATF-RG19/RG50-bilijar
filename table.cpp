@@ -3,8 +3,6 @@
 #include "draw_functions.h"
 #include "table.h"
 
-
-
 Table::Table()
 {
     
@@ -28,8 +26,15 @@ Table::Table()
 	balls[15].setColor(0.5, 0.0, 0.0); // tamno crvena
 	
 
-	//TO DO
+	time = 0;
+	stickAngle = 90;
 
+
+}
+
+void Table::setStickAngle(double angle)
+{
+	stickAngle = angle;
 }
 
 void Table::start(){
@@ -56,13 +61,87 @@ void Table::start(){
 	}
 }
 
-void Table::draw()
+int Table::num_of_visible()
 {
+	int number = 0;
+	for(int i = 0; i < 16; i++)
+	{
+		if(balls[i].getVisible()) number++;
+	}
+	return number;
+}
 
+// Provera da li se neka lopta krece
+bool Table::moving()
+{
+	
+	for(int i = 0; i < 16; i++)
+	{
+		if(balls[i].moving()) return true;
+	}
 
 	
+	return false;
+}
 
 
+void Table::shoot()
+{
+	const double s = 15; // Brzina udarca
+	const double pi = 3.14;
+	double a = stickAngle * pi / 180 + pi; // Ugao sa kojim udaramo loptu, 
+
+	// Postavljanje brzine 
+	balls[0].setV(s * sin(a), s * cos(a));
+}
+
+
+void Table::update(int currentTime)
+{
+	double timeStep = 0.001; 
+	int i, j;
+	
+	while(time < currentTime)
+	{
+		// Provera da li kugla upada u rupu, ili udara u martinelu ili udara u drugu kuglu
+		for(i = 0; i < 16; i++)
+		{
+			
+			balls[i].collideHoles();
+			balls[i].collideCushions();
+
+			
+			for(j = 0; j < i; j++)
+			{
+				balls[i].collideBall(balls[j]);
+			}
+		}
+
+		// Menjanje brzina i pozicije kako vreme tece
+		for(i = 0; i < 16; i++)
+		{
+			balls[i].updateSpeed(timeStep);
+			balls[i].updatePosition(timeStep);
+		}
+
+		// Vracanje bele kugle na sto ukoliko je upala u rupu.
+		if(!moving() && !balls[0].getVisible())
+		{
+			balls[0].setPosition(0, 0);
+			balls[0].setV(0, 0);
+			balls[0].setVisible(true);
+		}
+
+		;
+		// Ukoliko su sve lopte upale, zapocni igru ponovo.
+		if(num_of_visible() == 1) start();
+
+		time++;
+	}
+}
+
+void Table::draw()
+{
 	// Pod na kojem je sto
 	glColor3d(0.5, 0.5, 0.4); 
 	glPushMatrix();
@@ -74,7 +153,6 @@ void Table::draw()
 	glColor3d(0.3, 0.5, 0.6); 
 	glPushMatrix();
 	
-
 	//Prednji i Zadnji
 	glTranslated(-10, 0, 0); 
 	drawCuboid(0.1, 20, 20);
@@ -94,7 +172,7 @@ void Table::draw()
 	glPopMatrix();
 
 
-	double hsize = 0.5; // Velicina rupe
+	double hsize = 0.6; // Velicina rupe
 
 	// povrsina stola
 	glColor3d(0, 0.3, 0.2); 
@@ -155,9 +233,26 @@ void Table::draw()
 	glTranslated(+0.0, +3.0, 0.0); drawCylinder(0.2, 0.2, 2);
 	glPopMatrix();
 
+	//Crtanje kugli
 	for(int i = 0; i < 16; i++)
 	{
 		balls[i].draw();
 	}
+
+	//Crtanje stapa
+
+	if(!moving())
+	{
+		glColor3d(0.7, 0.6, 0.5); 
+		glPushMatrix();
+		glTranslated(balls[0].getX(), 0, balls[0].getZ());
+		glRotated(stickAngle, 0, 1, 0);
+		glTranslated(0, 0.15, 0.4);
+		glRotated(-5, 1, 0, 0);
+		drawCylinder(0.02, 0.06, 5.0);
+		glPopMatrix();
+	}
+
+
 
 }
